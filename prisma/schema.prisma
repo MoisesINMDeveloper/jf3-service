@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Aliado {
+  id         Int         @id @default(autoincrement())
+  name       String
+  image      String
+  categories Category[]
+  products   Product[]
+  orders     Order[]     // 👈 órdenes relacionadas con este aliado
+}
+
+model Category {
+  id       Int      @id @default(autoincrement())
+  name     String
+  aliadoId Int
+  aliado   Aliado   @relation(fields: [aliadoId], references: [id])
+  products Product[]
+
+  @@unique([aliadoId, name]) // nombre único por aliado
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  title       String
+  price       Float
+  images      String[]
+  description String
+  categoryId  Int
+  category    Category  @relation(fields: [categoryId], references: [id])
+  aliadoId    Int
+  aliado      Aliado    @relation(fields: [aliadoId], references: [id])
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id           Int          @id @default(autoincrement())
+  clientName   String
+  clientPhone  String
+  totalAmount  Float
+  status       OrderStatus  @default(PENDING)
+  aliadoId     Int
+  aliado       Aliado       @relation(fields: [aliadoId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  orderItems   OrderItem[]
+  payment      Payment?
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  price      Float     // precio unitario al momento de compra
+  productId  Int
+  product    Product   @relation(fields: [productId], references: [id])
+  orderId    Int
+  order      Order     @relation(fields: [orderId], references: [id])
+}
+
+model Payment {
+  id         Int      @id @default(autoincrement())
+  method     String
+  amount     Float
+  reference  String?
+  verified   Boolean  @default(false)
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  orderId    Int      @unique
+  order      Order    @relation(fields: [orderId], references: [id])
+}
+
+model Paydates {
+  id          Int      @id @default(autoincrement())
+  bank        String
+  code        String
+  cedula      String
+  phone       String
+}
+
+model UserAdmin {
+  id          Int         @id @default(autoincrement())
+  username    String      @unique  
+  password    String
+}
+
+model DeliveryOptions {
+  id          Int      @id @default(autoincrement())
+  name        String
+  fee         Float
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}

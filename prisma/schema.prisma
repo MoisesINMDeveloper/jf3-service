@@ -8,12 +8,13 @@ datasource db {
 }
 
 model Aliado {
-  id         Int         @id @default(autoincrement())
-  name       String
-  image      String
-  categories Category[]
-  products   Product[]
-  orders     Order[]     // 👈 órdenes relacionadas con este aliado
+  id              Int               @id @default(autoincrement())
+  name            String
+  image           String
+  categories      Category[]
+  products        Product[]
+  orders          Order[]
+  deliveryOptions DeliveryOptions[] // 👈 un aliado puede tener varios servicios de delivery
 }
 
 model Category {
@@ -90,10 +91,15 @@ model UserAdmin {
 }
 
 model DeliveryOptions {
-  id          Int      @id @default(autoincrement())
-  name        String
-  fee         Float
+  id        Int      @id @default(autoincrement())
+  name      String
+  fee       Float
+  aliadoId  Int
+  aliado    Aliado   @relation(fields: [aliadoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
 
 enum OrderStatus {
   PENDING

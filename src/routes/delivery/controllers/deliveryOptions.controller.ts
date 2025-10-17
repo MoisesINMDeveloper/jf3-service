@@ -8,8 +8,7 @@ import {
 } from "../services/deliveryOptions.service";
 
 export const createDeliveryOptionController = async (req: Request, res: Response) => {
-  const data = req.body;
-  const result = await createDeliveryOption(data);
+  const result = await createDeliveryOption(req.body);
   res.status(result.status).json(result);
 };
 
@@ -26,8 +25,7 @@ export const getDeliveryOptionByIdController = async (req: Request, res: Respons
 
 export const updateDeliveryOptionController = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const data = req.body;
-  const result = await updateDeliveryOption(id, data);
+  const result = await updateDeliveryOption(id, req.body);
   res.status(result.status).json(result);
 };
 

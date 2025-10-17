@@ -20,7 +20,11 @@ export const getAllAliados = async () => {
     const aliados = await aliadoPrisma.findMany({
       include: {
         categories: true,
-        products: true,
+        products: {
+          include: {
+            category: true, // si tus productos tienen una relación con Category
+          },
+        },
         orders: true,
       },
     });
@@ -30,6 +34,7 @@ export const getAllAliados = async () => {
     return { status: 500, message: 'Error del servidor' };
   }
 };
+
 
 // Obtener aliado por ID
 export const getAliadoById = async (id: number) => {
